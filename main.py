@@ -26,14 +26,18 @@ def init():
         if f.endswith(".json"):
             try:
                 for x in json.load(open("data/" + f))["questions"]: D["q"][x["id"]] = x
-            except:
-                pass
+            except json.JSONDecodeError as e:
+                print("Invalid JSON syntax:", e)
+                raise
+
     print ("ok",len(D["q"]))
 
 
 def sv():
     try: json.dump({k: D[k] for k in ["e", "r", "p", "c"]}, open(F, "w"))
-    except Exception as e: print("erro", e)
+    except json.JSONDecodeError as e:
+        print("Invalid JSON syntax:", e)
+        raise
 
 
 def ld():
@@ -41,8 +45,9 @@ def ld():
         d2 = json.load(open(F))
         for k in d2: D[k] = d2[k]
         for x in D["c"]: D["q"][x["id"]] = x
-    except:
-        pass
+    except json.JSONDecodeError as e:
+        print("Invalid JSON syntax:", e)
+        raise
 
 
 init(); ld()
@@ -76,7 +81,7 @@ def validate(x):
 
 
 @app.get("/api/questions")
-def qs(topic: str = None):
+def qs(topic: str | None):
     return [x for x in D["q"].values() if topic == None or x["topic"] == topic]
 
 
@@ -104,8 +109,9 @@ async def up(file: UploadFile = File(...)):
                 o = [r["option_" + c] for c in "abcdef" if r.get("option_" + c)]; k = [ "ABCDEF".index(z) for z in r["correct"].split(";") ]
                 x = {"id": r["id"], "topic": r["topic"], "text": r["text"], "options": o, "correct": k, "explanation": r.get("explanation", ""), "type": "multiple" if len(k) > 1 else "single"}
                 D["q"][x["id"]] = x; D["c"].append(x); n += 1
-    except:
-        pass
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            print(e)
+            raise
     sv()
     return {"ok": True, "added": n}
 
