@@ -34,19 +34,16 @@ def test_upload_csv(client):
 # ---------- Ticket G1-A · Pydantic ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G1-A: correct tem de apontar para uma opção que existe")
 def test_correct_out_of_range_is_422(client, new_question):
     new_question["correct"] = [7]
     assert client.post("/api/questions", params=ADMIN, json=new_question).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G1-A: correct é uma lista de índices, não um número solto")
 def test_correct_must_be_a_list(client, new_question):
     new_question["correct"] = 2
     assert client.post("/api/questions", params=ADMIN, json=new_question).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G1-A: uma pergunta de escolha precisa de pelo menos 2 opções")
 def test_needs_two_options(client, new_question):
     new_question["options"] = ["4"]
     new_question["correct"] = [0]
