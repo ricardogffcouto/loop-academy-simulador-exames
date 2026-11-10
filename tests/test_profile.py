@@ -39,19 +39,16 @@ def exam_with_score(right: int, total: int) -> None:
 # ---------- Ticket G5-A · Pydantic ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G5-A: data do exame daqui a 1000 anos não faz sentido")
 def test_far_future_date_is_422(client):
     r = client.post("/api/profile", json={"name": "Ana", "certification": "X", "exam_date": "3026-01-01"})
     assert r.status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G5-A: a data do exame não pode ser no passado")
 def test_past_date_is_422(client):
     r = client.post("/api/profile", json={"name": "Ana", "certification": "X", "exam_date": "2020-01-01"})
     assert r.status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G5-A: 'amanhã' não é uma data (e hoje parte a página para todos)")
 def test_text_date_is_422(client):
     r = client.post("/api/profile", json={"name": "Ana", "certification": "X", "exam_date": "amanhã"})
     assert r.status_code == 422
