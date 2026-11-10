@@ -1,12 +1,31 @@
 """Grupo 5 · Perfil do aluno e estatísticas da turma."""
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from pydantic import BaseModel, field_validator
 
 from app import store
 
 router = APIRouter(prefix="/api", tags=["perfil e estatísticas"])
+
+
+class Profile(BaseModel):
+    """Dados válidos do perfil de preparação para um exame."""
+
+    name: str
+    certification: str
+    exam_date: date
+
+    @field_validator("exam_date")
+    @classmethod
+    def validate_exam_date(cls, exam_date: date) -> date:
+        """Aceita apenas datas entre hoje e os próximos dois anos."""
+        today = date.today()
+        latest_allowed_date = today + timedelta(days=730)
+        if not today <= exam_date <= latest_allowed_date:
+            raise ValueError("A data do exame deve estar entre hoje e os próximos 730 dias.")
+        return exam_date
 
 
 @router.get("/profile")
@@ -19,9 +38,10 @@ def get_profile() -> dict:
 
 
 @router.post("/profile")
-async def save_profile(request: Request) -> dict:
+async def save_profile(profile: Profile) -> dict:
+    """Valida, guarda e devolve o perfil de preparação para o exame."""
     store.profile.clear()
-    store.profile.update(await request.json())
+    store.profile.update(profile.model_dump(mode="json"))
     store.save()
     return get_profile()
 
