@@ -8,6 +8,7 @@ import random
 import time
 import uuid
 from datetime import date, datetime
+from typing import Annotated
 
 from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
@@ -101,7 +102,7 @@ async def addQ(request: Request):
 
 
 @app.post("/api/upload")
-async def up(file: UploadFile = File(...)):
+async def up(file: Annotated[UploadFile, File()]):
     b = await file.read(); n = 0
     try:
         if file.filename.endswith(".json"):
@@ -112,8 +113,8 @@ async def up(file: UploadFile = File(...)):
                 o = [r["option_" + c] for c in "abcdef" if r.get("option_" + c)]; k = [ "ABCDEF".index(z) for z in r["correct"].split(";") ]
                 x = {"id": r["id"], "topic": r["topic"], "text": r["text"], "options": o, "correct": k, "explanation": r.get("explanation", ""), "type": "multiple" if len(k) > 1 else "single"}
                 D["q"][x["id"]] = x; D["c"].append(x); n += 1
-    except:
-        pass
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as e:
+        print("Error: file format not supported", e)
     sv()
     return {"ok": True, "added": n}
 
