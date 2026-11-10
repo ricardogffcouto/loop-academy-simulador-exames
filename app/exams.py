@@ -5,11 +5,16 @@ import time
 import uuid
 
 from fastapi import APIRouter, Request
+from pydantic import BaseModel, Field, field_validator
 
 from app import store
 
 router = APIRouter(prefix="/api", tags=["exames"])
 
+class ExamRequest(BaseModel):
+    num: int = Field(10, ge=1, le=50)
+    minutes: int = Field(15, ge=1, le=180)
+    topics: list[str] = []
 
 def pick_questions(count: int, topics: list[str] = []) -> list[str]:
     """Escolhe ao acaso `count` ids de perguntas dos tópicos pedidos (todos, se nenhum)."""
@@ -20,12 +25,12 @@ def pick_questions(count: int, topics: list[str] = []) -> list[str]:
 
 
 @router.post("/exam")
-async def create_exam(request: Request) -> dict:
-    body = await request.json()
-    count = int(body.get("num", 10))
-    minutes = int(body.get("minutes", 15))
-    if body.get("topics"):
-        question_ids = pick_questions(count, body["topics"])
+async def create_exam(request: ExamRequest) -> dict:
+    count = request.num
+    minutes = request.minutes
+
+    if request.topics:
+        question_ids = pick_questions(count, request.topics)
     else:
         question_ids = pick_questions(count)
     exam_id = uuid.uuid4().hex[:8]

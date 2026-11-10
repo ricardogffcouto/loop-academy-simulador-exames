@@ -25,17 +25,17 @@ def test_open_exam_again(client):
 # ---------- Ticket G2-A · Pydantic ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G2-A: um exame de 0 minutos não faz sentido")
+#@pytest.mark.xfail(strict=True, reason="G2-A: um exame de 0 minutos não faz sentido")
 def test_zero_minutes_is_422(client):
     assert client.post("/api/exam", json={"num": 5, "minutes": 0}).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G2-A: número de perguntas negativo não faz sentido")
+#@pytest.mark.xfail(strict=True, reason="G2-A: número de perguntas negativo não faz sentido")
 def test_negative_count_is_422(client):
     assert client.post("/api/exam", json={"num": -3, "minutes": 10}).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G2-A: num tem de ser um número")
+#@pytest.mark.xfail(strict=True, reason="G2-A: num tem de ser um número")
 def test_count_must_be_a_number(client):
     assert client.post("/api/exam", json={"num": "abc", "minutes": 10}).status_code == 422
 
