@@ -29,18 +29,15 @@ def test_export_csv(client):
 # ---------- Ticket G4-A · Pydantic ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: uma nota vai de 0 a 100")
 def test_pct_above_100_is_422(client):
     assert client.post("/api/ranking", json={"name": "Ana", "pct": 150}).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: o nome não pode trazer HTML")
 def test_name_with_html_is_422(client):
     r = client.post("/api/ranking", json={"name": "<img src=x onerror=alert(1)>", "pct": 50})
     assert r.status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: sem nota é 422, não 500")
 def test_missing_pct_is_422(client):
     assert client.post("/api/ranking", json={"name": "Ana"}).status_code == 422
 
@@ -48,18 +45,14 @@ def test_missing_pct_is_422(client):
 # ---------- Ticket G4-B · erros HTTP e exportação ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G4-B: password errada é 401, não 'ok'")
 def test_clear_with_wrong_password_is_401(client):
     assert client.delete("/api/ranking", params={"pwd": "errada"}).status_code == 401
 
 
-@pytest.mark.xfail(strict=True, reason="G4-B: quem acerta tudo aparece como aprovado no CSV")
 def test_csv_passed_uses_pass_mark(client):
     take_exam(client, "Arquitetura Transformer", name="Rui")
     assert client.get("/api/export.csv").text.strip().splitlines()[1].endswith("True")
 
-
-@pytest.mark.xfail(strict=True, reason="G4-B: o Exportar YAML precisa de uma dependência que falta")
 def test_requirements_include_yaml():
     requirements = (Path(__file__).parent.parent / "requirements.txt").read_text().lower()
     assert "pyyaml" in requirements

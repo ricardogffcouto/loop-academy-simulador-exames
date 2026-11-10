@@ -3,12 +3,28 @@
 import io
 from datetime import datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
 
 from app import store
 
+from pydantic import BaseModel, Field, field_validator
+
+from typing import Annotated
+
 router = APIRouter(prefix="/api", tags=["ranking"])
+
+class RankingEntryIn(BaseModel):
+    """Entrada de ranking enviada pelo cliente."""
+
+    name: str = Field(min_length=1, max_length=30)
+    pct: float = Field(ge=0, le=100)
+
+    @field_validator("name")
+    def name_must_not_contain_html(cls, v: str) -> str:
+        if "<" in v or ">" in v:
+            raise ValueError("name must not contain HTML")
+        return v
 
 
 def exam_score(exam: dict) -> float:
@@ -27,6 +43,13 @@ def exam_score(exam: dict) -> float:
     return score
 
 
+def require_admin(pwd: str = ""):
+    """ Verifica a pass do admin """
+    if pwd != store.ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Password incorreta")
+
+
+
 @router.get("/ranking")
 def get_ranking() -> list[dict]:
     rows = []
@@ -41,14 +64,13 @@ def get_ranking() -> list[dict]:
 
 
 @router.post("/ranking")
-async def add_ranking_entry(request: Request) -> dict:
-    body = await request.json()
+async def add_ranking_entry(entry: RankingEntryIn) -> dict:
     store.results.append(
         {
             "exam_id": None,
-            "name": body["name"],
+            "name": entry.name,
             "date": datetime.now().strftime("%d/%m %H:%M"),
-            "pct": body["pct"],
+            "pct": entry.pct,
         }
     )
     store.save()
@@ -56,7 +78,7 @@ async def add_ranking_entry(request: Request) -> dict:
 
 
 @router.delete("/ranking")
-def clear_ranking(pwd: str = "") -> dict:
+def clear_ranking(pwd: Annotated[str, Depends(require_admin)]) -> dict:
     if pwd == store.ADMIN_PASSWORD:
         store.results.clear()
         store.save()
@@ -76,7 +98,7 @@ def export_csv() -> PlainTextResponse:
             if sorted(exam["answers"].get(qid, [])) == sorted(store.questions[qid]["correct"])
         )
         total = len(exam["questions"])
-        out.write(f"{exam['id']},{exam.get('name', '')},{score},{total},{score >= 70}\n")
+        out.write(f"{exam['id']},{exam.get('name', '')},{score},{total},{(score / total) * 100 >= 70}\n")
     return PlainTextResponse(out.getvalue(), media_type="text/csv")
 
 
