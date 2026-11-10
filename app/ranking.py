@@ -3,12 +3,14 @@
 import io
 from datetime import datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
 
 from app import store
 
 from pydantic import BaseModel, Field, field_validator
+
+from typing import Annotated
 
 router = APIRouter(prefix="/api", tags=["ranking"])
 
@@ -41,6 +43,13 @@ def exam_score(exam: dict) -> float:
     return score
 
 
+def require_admin(pwd: str = ""):
+    """ Verifica a pass do admin """
+    if pwd != store.ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Password incorreta")
+
+
+
 @router.get("/ranking")
 def get_ranking() -> list[dict]:
     rows = []
@@ -69,7 +78,7 @@ async def add_ranking_entry(entry: RankingEntryIn) -> dict:
 
 
 @router.delete("/ranking")
-def clear_ranking(pwd: str = "") -> dict:
+def clear_ranking(pwd: Annotated[str, Depends(require_admin)]) -> dict:
     if pwd == store.ADMIN_PASSWORD:
         store.results.clear()
         store.save()

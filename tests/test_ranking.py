@@ -45,7 +45,6 @@ def test_missing_pct_is_422(client):
 # ---------- Ticket G4-B · erros HTTP e exportação ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G4-B: password errada é 401, não 'ok'")
 def test_clear_with_wrong_password_is_401(client):
     assert client.delete("/api/ranking", params={"pwd": "errada"}).status_code == 401
 
@@ -54,7 +53,6 @@ def test_csv_passed_uses_pass_mark(client):
     take_exam(client, "Arquitetura Transformer", name="Rui")
     assert client.get("/api/export.csv").text.strip().splitlines()[1].endswith("True")
 
-@pytest.mark.xfail(strict=True, reason="G4-B: o Exportar YAML precisa de uma dependência que falta")
 def test_requirements_include_yaml():
     requirements = (Path(__file__).parent.parent / "requirements.txt").read_text().lower()
     assert "pyyaml" in requirements
