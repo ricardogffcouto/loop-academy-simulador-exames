@@ -4,28 +4,39 @@ import random
 import time
 import uuid
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
+from pydantic import BaseModel, Field, field_validator
 
 from app import store
 
 router = APIRouter(prefix="/api", tags=["exames"])
 
 
-def pick_questions(count: int, topics: list[str] = []) -> list[str]:
+class ExamRequest(BaseModel):
+    num: int = Field(10, ge=1, le=50)
+    minutes: int = Field(15, ge=1, le=180)
+    topics: list[str] = []
+
+
+def pick_questions(count: int, topics: list[str] | None = None) -> list[str]:
     """Escolhe ao acaso `count` ids de perguntas dos tópicos pedidos (todos, se nenhum)."""
+    topics = topics or store.topics()
     if not topics:
         topics.extend(store.topics())
     pool = [qid for qid, question in store.questions.items() if question["topic"] in topics]
+
+    if count > len(pool):
+        raise HTTPException(status_code=400, detail=topics)
     return random.sample(pool, count)
 
 
 @router.post("/exam")
-async def create_exam(request: Request) -> dict:
-    body = await request.json()
-    count = int(body.get("num", 10))
-    minutes = int(body.get("minutes", 15))
-    if body.get("topics"):
-        question_ids = pick_questions(count, body["topics"])
+async def create_exam(request: ExamRequest) -> dict:
+    count = request.num
+    minutes = request.minutes
+
+    if request.topics:
+        question_ids = pick_questions(count, request.topics)
     else:
         question_ids = pick_questions(count)
     exam_id = uuid.uuid4().hex[:8]
@@ -41,6 +52,8 @@ async def create_exam(request: Request) -> dict:
 
 @router.get("/exam/{exam_id}")
 def get_exam(exam_id: str) -> dict:
+    if exam_id not in store.exams:
+        raise HTTPException(status_code=404, detail=f"Exame {exam_id} não existe")
     return exam_view(store.exams[exam_id])
 
 
