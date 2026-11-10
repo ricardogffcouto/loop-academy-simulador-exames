@@ -1,14 +1,17 @@
 # exam sim v0.3 - feito a correr p/ a demo, depois limpa-se
 # NAO MEXER no D sem falar comigo!!
-from fastapi import FastAPI, Request, UploadFile, File
+import csv
+import io
+import json
+import os
+import random
+import time
+import uuid
+from datetime import date, datetime
+
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-import json, random, os, time, csv, io
-from datetime import datetime, date
-import uuid
-import math
-import re
-import sys
 
 app = FastAPI(title="Simulador de Exames")
 app.mount("/static", StaticFiles(directory="static"), name="static")
