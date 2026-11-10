@@ -9,7 +9,7 @@ import time
 import uuid
 from datetime import date, datetime
 
-from fastapi import FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -102,7 +102,7 @@ async def addQ(request: Request):
 
 
 @app.post("/api/upload")
-async def up(file: UploadFile = File(...)):
+async def up(file: UploadFile):
     b = await file.read(); n = 0
     try:
         if file.filename.endswith(".json"):
@@ -151,11 +151,10 @@ async def sub(i, request: Request):
     for j in e["questions"]:
         x = D["q"][j]; y = a.get(j, []); ok = False
         if x["type"] == "single":
-            if len(y) == 1:
-                if y[0] == x["correct"][0]:
+            if len(y) == 1 and y[0] == x["correct"][0]:
                     ok = True
-        elif x["type"] == "multiple":
-            if sorted(y) == sorted(x["correct"]): ok = True
+        elif x["type"] == "multiple" and  sorted(y) == sorted(x["correct"]):
+            ok = True
         # TODO v/f
         if ok == True:
             s = s + 1
