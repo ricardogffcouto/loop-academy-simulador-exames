@@ -32,8 +32,12 @@ class Profile(BaseModel):
 def get_profile() -> dict:
     profile = dict(store.profile)
     if "exam_date" in profile:
-        exam_day = datetime.fromisoformat(profile["exam_date"]).date()
-        profile["days_left"] = (exam_day - date.today()).days
+        try:
+            exam_day = datetime.fromisoformat(profile["exam_date"]).date()
+        except ValueError:
+            pass
+        else:
+            profile["days_left"] = (exam_day - date.today()).days
     return profile
 
 
@@ -48,6 +52,7 @@ async def save_profile(profile: Profile) -> dict:
 
 @router.get("/stats")
 def get_stats() -> dict:
+    """  Devolve as estatísticas da turma, incluindo exames feitos, aprovados e percentagem de acertos por tópico."""
     by_topic: dict[str, list[int]] = {}  # tópico -> [certas, total]
     finished = 0
     passed = 0
@@ -65,7 +70,8 @@ def get_stats() -> dict:
             if ok:
                 score += 1
                 counts[0] += 1
-        if score / len(exam["questions"]) > 0.7:
+        percentage = round(score / len(exam["questions"]) * 100)
+        if percentage >= store.PASS_MARK:
             passed += 1
     return {
         "exams": finished,
