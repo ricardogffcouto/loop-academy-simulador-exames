@@ -50,11 +50,9 @@ def test_clear_with_wrong_password_is_401(client):
     assert client.delete("/api/ranking", params={"pwd": "errada"}).status_code == 401
 
 
-@pytest.mark.xfail(strict=True, reason="G4-B: quem acerta tudo aparece como aprovado no CSV")
 def test_csv_passed_uses_pass_mark(client):
     take_exam(client, "Arquitetura Transformer", name="Rui")
     assert client.get("/api/export.csv").text.strip().splitlines()[1].endswith("True")
-
 
 @pytest.mark.xfail(strict=True, reason="G4-B: o Exportar YAML precisa de uma dependência que falta")
 def test_requirements_include_yaml():

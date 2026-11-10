@@ -89,7 +89,7 @@ def export_csv() -> PlainTextResponse:
             if sorted(exam["answers"].get(qid, [])) == sorted(store.questions[qid]["correct"])
         )
         total = len(exam["questions"])
-        out.write(f"{exam['id']},{exam.get('name', '')},{score},{total},{score >= 70}\n")
+        out.write(f"{exam['id']},{exam.get('name', '')},{score},{total},{(score / total) * 100 >= 70}\n")
     return PlainTextResponse(out.getvalue(), media_type="text/csv")
 
 
