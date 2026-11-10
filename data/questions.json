@@ -1,0 +1,642 @@
+{
+ "questions": [
+  {
+   "id": "genai-001",
+   "topic": "Fundamentos de LLM",
+   "text": "Num modelo de linguagem, o que é um token?",
+   "options": [
+    "Um neurónio da última camada da rede",
+    "Um ficheiro com os pesos do modelo",
+    "Uma chave de API usada para autenticar pedidos",
+    "Uma unidade de texto (palavra, parte de palavra ou símbolo) processada pelo modelo"
+   ],
+   "correct": [
+    3
+   ],
+   "explanation": "Os LLM trabalham sobre tokens produzidos por um tokenizer; uma palavra pode dar origem a vários tokens.",
+   "type": "single"
+  },
+  {
+   "id": "genai-002",
+   "topic": "Fundamentos de LLM",
+   "text": "O que limita a 'context window' (janela de contexto) de um LLM?",
+   "options": [
+    "O número máximo de tokens que o modelo consegue considerar de uma vez (prompt + resposta)",
+    "O tamanho máximo do vocabulário do tokenizer",
+    "O número de GPUs usadas no treino",
+    "O número de utilizadores em simultâneo"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "A janela de contexto é medida em tokens e inclui a entrada e a saída gerada.",
+   "type": "single"
+  },
+  {
+   "id": "genai-003",
+   "topic": "Fundamentos de LLM",
+   "text": "Aumentar a 'temperature' na geração de texto tem normalmente que efeito?",
+   "options": [
+    "Respostas mais variadas e menos previsíveis",
+    "Respostas sempre mais curtas",
+    "Inferência mais rápida",
+    "Menos consumo de memória da GPU"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "A temperature altera a distribuição de probabilidades na amostragem: valores altos aumentam a diversidade; valores perto de 0 tornam a saída quase determinística.",
+   "type": "single"
+  },
+  {
+   "id": "genai-004",
+   "topic": "Fundamentos de LLM",
+   "text": "O que é uma 'alucinação' de um LLM?",
+   "options": [
+    "Uma resposta recusada por políticas de segurança",
+    "Uma falha de memória da GPU durante a inferência",
+    "Uma resposta fluente e convincente mas factualmente errada ou inventada",
+    "Um erro de sintaxe no prompt"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "Alucinações são conteúdos plausíveis mas sem suporte factual; RAG e verificação ajudam a reduzi-las.",
+   "type": "single"
+  },
+  {
+   "id": "genai-005",
+   "topic": "Arquitetura Transformer",
+   "text": "Qual é o mecanismo central da arquitetura Transformer?",
+   "options": [
+    "Recorrência (como nas RNN/LSTM)",
+    "Árvores de decisão",
+    "Camadas convolucionais",
+    "Self-attention"
+   ],
+   "correct": [
+    3
+   ],
+   "explanation": "O artigo 'Attention Is All You Need' (2017) introduziu o Transformer, baseado em self-attention em vez de recorrência.",
+   "type": "single"
+  },
+  {
+   "id": "genai-006",
+   "topic": "Arquitetura Transformer",
+   "text": "Porque é que os Transformers precisam de 'positional encoding'?",
+   "options": [
+    "Para traduzir o texto para inglês antes de o processar",
+    "Para comprimir o modelo",
+    "Porque a self-attention, por si só, não tem noção da ordem dos tokens",
+    "Para dividir o texto em frases"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "Sem informação de posição, a atenção trataria a sequência como um conjunto sem ordem.",
+   "type": "single"
+  },
+  {
+   "id": "genai-007",
+   "topic": "Arquitetura Transformer",
+   "text": "Modelos como o GPT, que geram texto token a token, são tipicamente de que tipo?",
+   "options": [
+    "Modelos de clustering",
+    "Encoder-only",
+    "Decoder-only, autorregressivos",
+    "Redes convolucionais"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "Modelos generativos de texto como o GPT usam só o decoder e preveem o próximo token com base nos anteriores.",
+   "type": "single"
+  },
+  {
+   "id": "genai-008",
+   "topic": "Arquitetura Transformer",
+   "text": "O que representa um embedding?",
+   "options": [
+    "Um vetor numérico que captura o significado de um texto ou token",
+    "Um tipo de GPU",
+    "Uma imagem comprimida",
+    "O código-fonte do modelo"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "Textos com significado parecido têm embeddings próximos, o que permite pesquisa semântica.",
+   "type": "single"
+  },
+  {
+   "id": "genai-009",
+   "topic": "Prompt engineering",
+   "text": "O que é 'few-shot prompting'?",
+   "options": [
+    "Treinar o modelo com poucas GPUs",
+    "Incluir alguns exemplos de entrada/saída no prompt para orientar a resposta",
+    "Fazer várias perguntas seguidas ao modelo",
+    "Reduzir o número de tokens da resposta"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "Os exemplos no prompt ajudam o modelo a perceber o formato e a tarefa sem alterar os pesos.",
+   "type": "single"
+  },
+  {
+   "id": "genai-010",
+   "topic": "Prompt engineering",
+   "text": "Quais destas práticas tornam um prompt mais eficaz? (escolhe 2)",
+   "options": [
+    "Pedir sempre a resposta com temperature máxima",
+    "Usar o mínimo de contexto possível, mesmo quando a tarefa é ambígua",
+    "Dar instruções claras e o formato de saída esperado",
+    "Fornecer o contexto relevante para a tarefa"
+   ],
+   "correct": [
+    2,
+    3
+   ],
+   "explanation": "Instruções claras, formato de saída e contexto relevante reduzem ambiguidade e melhoram a qualidade.",
+   "type": "multiple"
+  },
+  {
+   "id": "genai-011",
+   "topic": "Prompt engineering",
+   "text": "Para que serve pedir 'chain-of-thought' (raciocínio passo a passo)?",
+   "options": [
+    "Aumentar a janela de contexto do modelo",
+    "Melhorar o desempenho em tarefas que exigem vários passos de raciocínio",
+    "Reduzir o custo da inferência",
+    "Garantir que a resposta nunca tem erros"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "Pedir passos intermédios costuma ajudar em problemas de lógica e matemática, mas não garante respostas corretas.",
+   "type": "single"
+  },
+  {
+   "id": "genai-012",
+   "topic": "RAG",
+   "text": "Em Retrieval-Augmented Generation (RAG), o que acontece antes de o LLM gerar a resposta?",
+   "options": [
+    "Os pesos do modelo são comprimidos",
+    "O modelo é re-treinado com os documentos da empresa",
+    "São recuperados documentos relevantes e incluídos no contexto do prompt",
+    "A pergunta é traduzida para código"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "O RAG junta pesquisa (retrieval) e geração: o modelo responde com base em contexto recuperado, sem mudar os pesos.",
+   "type": "single"
+  },
+  {
+   "id": "genai-013",
+   "topic": "RAG",
+   "text": "Quais são vantagens típicas de RAG face a fine-tuning? (escolhe 2)",
+   "options": [
+    "Atualizar o conhecimento é tão simples como atualizar os documentos",
+    "Dispensa qualquer tipo de base de dados",
+    "Elimina completamente as alucinações",
+    "Permite citar as fontes usadas na resposta"
+   ],
+   "correct": [
+    0,
+    3
+   ],
+   "explanation": "RAG facilita a atualização e a rastreabilidade das fontes; reduz alucinações mas não as elimina.",
+   "type": "multiple"
+  },
+  {
+   "id": "genai-014",
+   "topic": "RAG",
+   "text": "Porque é que os documentos são divididos em 'chunks' num pipeline RAG?",
+   "options": [
+    "Porque as bases de dados vetoriais só aceitam texto em inglês",
+    "Para o modelo os ler mais depressa durante o treino",
+    "Para encriptar os documentos",
+    "Para caberem na janela de contexto e a pesquisa devolver trechos relevantes"
+   ],
+   "correct": [
+    3
+   ],
+   "explanation": "Chunks mais pequenos permitem recuperar só o trecho útil e respeitar o limite de tokens.",
+   "type": "single"
+  },
+  {
+   "id": "genai-015",
+   "topic": "RAG",
+   "text": "Que tipo de base de dados é usado tipicamente para pesquisa semântica com embeddings?",
+   "options": [
+    "Sistema de ficheiros",
+    "Base de dados de séries temporais",
+    "Folha de cálculo",
+    "Base de dados vetorial"
+   ],
+   "correct": [
+    3
+   ],
+   "explanation": "Bases de dados vetoriais encontram os vetores mais próximos (ex.: por similaridade de cosseno).",
+   "type": "single"
+  },
+  {
+   "id": "genai-016",
+   "topic": "Treino e fine-tuning",
+   "text": "O que é fine-tuning?",
+   "options": [
+    "Continuar o treino de um modelo pré-treinado com dados de uma tarefa ou domínio específico",
+    "Escrever prompts mais curtos",
+    "Treinar um modelo de raiz sem dados",
+    "Escolher a GPU mais rápida para a inferência"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "O fine-tuning ajusta os pesos de um modelo existente a um caso de uso específico.",
+   "type": "single"
+  },
+  {
+   "id": "genai-017",
+   "topic": "Treino e fine-tuning",
+   "text": "Qual é a ideia principal do LoRA (Low-Rank Adaptation)?",
+   "options": [
+    "Treinar apenas pequenas matrizes adicionais em vez de todos os pesos do modelo",
+    "Reduzir a resolução das imagens de treino",
+    "Usar apenas o CPU para treinar",
+    "Apagar camadas do modelo para o tornar mais rápido"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "LoRA é uma técnica de fine-tuning eficiente em parâmetros (PEFT): congela o modelo e treina adaptadores de baixa ordem.",
+   "type": "single"
+  },
+  {
+   "id": "genai-018",
+   "topic": "Treino e fine-tuning",
+   "text": "Para que serve o RLHF (Reinforcement Learning from Human Feedback)?",
+   "options": [
+    "Acelerar a tokenização",
+    "Converter o modelo para outro formato de ficheiro",
+    "Reduzir o tamanho do vocabulário",
+    "Alinhar o comportamento do modelo com preferências humanas"
+   ],
+   "correct": [
+    3
+   ],
+   "explanation": "No RLHF, avaliações humanas treinam um modelo de recompensa usado para ajustar o LLM.",
+   "type": "single"
+  },
+  {
+   "id": "genai-019",
+   "topic": "Treino e fine-tuning",
+   "text": "Um modelo tem excelente desempenho nos dados de treino mas fraco em dados novos. O que é mais provável?",
+   "options": [
+    "Janela de contexto demasiado grande",
+    "Temperature demasiado baixa",
+    "Overfitting",
+    "Underfitting"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "Overfitting: o modelo memorizou os dados de treino e não generaliza.",
+   "type": "single"
+  },
+  {
+   "id": "genai-020",
+   "topic": "Ecossistema NVIDIA",
+   "text": "Qual é a principal razão para treinar e executar redes neuronais em GPUs?",
+   "options": [
+    "Não precisam de drivers",
+    "Executam muitas operações de matrizes em paralelo",
+    "Têm mais memória de disco do que os CPUs",
+    "Só as GPUs suportam Python"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "Redes neuronais são dominadas por multiplicações de matrizes, que as GPUs paralelizam com milhares de núcleos.",
+   "type": "single"
+  },
+  {
+   "id": "genai-021",
+   "topic": "Ecossistema NVIDIA",
+   "text": "O que é o CUDA?",
+   "options": [
+    "Um modelo de linguagem da NVIDIA",
+    "Uma base de dados vetorial",
+    "A plataforma de computação paralela e modelo de programação da NVIDIA para GPUs",
+    "Uma linguagem de marcação para prompts"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "O CUDA permite usar GPUs NVIDIA para computação geral e está na base de frameworks como PyTorch.",
+   "type": "single"
+  },
+  {
+   "id": "genai-022",
+   "topic": "Ecossistema NVIDIA",
+   "text": "Para que serve o NVIDIA TensorRT-LLM?",
+   "options": [
+    "Otimizar a inferência de LLMs em GPUs NVIDIA",
+    "Anotar dados de treino manualmente",
+    "Criar apresentações a partir de texto",
+    "Gerir repositórios Git"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "O TensorRT-LLM é uma biblioteca para acelerar a inferência de LLMs em GPUs NVIDIA.",
+   "type": "single"
+  },
+  {
+   "id": "genai-023",
+   "topic": "Ecossistema NVIDIA",
+   "text": "Qual é o papel do NVIDIA Triton Inference Server?",
+   "options": [
+    "Servir modelos em produção (inferência) a partir de vários frameworks",
+    "Treinar tokenizers",
+    "Armazenar embeddings",
+    "Desenhar a arquitetura de redes neuronais visualmente"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "O Triton é um servidor de inferência open source que suporta modelos de vários frameworks (PyTorch, TensorRT, ONNX, ...).",
+   "type": "single"
+  },
+  {
+   "id": "genai-024",
+   "topic": "IA responsável",
+   "text": "Quais destas medidas ajudam a usar LLMs de forma responsável? (escolhe 2)",
+   "options": [
+    "Avaliar o modelo quanto a enviesamentos (bias) nos resultados",
+    "Assumir que as respostas do modelo estão sempre corretas",
+    "Enviar dados pessoais de clientes sem controlo para qualquer API",
+    "Implementar guardrails para filtrar entradas e saídas indesejadas"
+   ],
+   "correct": [
+    0,
+    3
+   ],
+   "explanation": "Avaliação de bias, guardrails (ex.: NeMo Guardrails) e proteção de dados são práticas de IA responsável.",
+   "type": "multiple"
+  },
+  {
+   "id": "genai-025",
+   "topic": "IA responsável",
+   "text": "O que é 'prompt injection'?",
+   "options": [
+    "Copiar prompts de outros utilizadores",
+    "Texto malicioso que tenta fazer o modelo ignorar as instruções originais",
+    "Uma técnica para acelerar a inferência",
+    "Injetar mais memória na GPU"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "Prompt injection é um risco de segurança: conteúdo de entrada tenta sobrepor-se às instruções do sistema.",
+   "type": "single"
+  },
+  {
+   "id": "fund-001",
+   "topic": "Python",
+   "text": "Qual é o resultado de len({\"a\": 1, \"b\": 2})?",
+   "options": [
+    "1",
+    "2",
+    "4",
+    "Dá erro"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "len de um dicionário conta as chaves.",
+   "type": "single"
+  },
+  {
+   "id": "fund-002",
+   "topic": "Python",
+   "text": "Que estrutura usarias para guardar pares chave-valor?",
+   "options": [
+    "list",
+    "tuple",
+    "dict",
+    "set"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "Um dicionário associa chaves a valores.",
+   "type": "single"
+  },
+  {
+   "id": "fund-003",
+   "topic": "Python",
+   "text": "Quais destes tipos são mutáveis? (escolhe 2)",
+   "options": [
+    "list",
+    "tuple",
+    "dict",
+    "str"
+   ],
+   "correct": [
+    0,
+    2
+   ],
+   "explanation": "list e dict podem ser alterados depois de criados.",
+   "type": "multiple"
+  },
+  {
+   "id": "fund-004",
+   "topic": "Python",
+   "text": "O que devolve uma função Python sem instrução return?",
+   "options": [
+    "0",
+    "None",
+    "False",
+    "Uma string vazia"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "Sem return explícito a função devolve None.",
+   "type": "single"
+  },
+  {
+   "id": "fund-005",
+   "topic": "Python",
+   "text": "O que faz [x * 2 for x in range(3)]?",
+   "options": [
+    "Cria a lista [0, 2, 4]",
+    "Cria a lista [2, 4, 6]",
+    "Dá erro de sintaxe",
+    "Cria um dicionário"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "range(3) gera 0, 1 e 2; cada um é multiplicado por 2.",
+   "type": "single"
+  },
+  {
+   "id": "fund-006",
+   "topic": "Git",
+   "text": "Que comando mostra os ficheiros alterados e o que está em stage?",
+   "options": [
+    "git log",
+    "git status",
+    "git push",
+    "git init"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "git status mostra o estado da working tree e do stage.",
+   "type": "single"
+  },
+  {
+   "id": "fund-007",
+   "topic": "Git",
+   "text": "Quais comandos trazem alterações do remoto? (escolhe 2)",
+   "options": [
+    "git fetch",
+    "git push",
+    "git pull",
+    "git commit"
+   ],
+   "correct": [
+    0,
+    2
+   ],
+   "explanation": "fetch descarrega; pull faz fetch + merge.",
+   "type": "multiple"
+  },
+  {
+   "id": "fund-008",
+   "topic": "Git",
+   "text": "Qual é a forma segura de desfazer um commit que já foi enviado para o main partilhado?",
+   "options": [
+    "git push --force",
+    "git revert",
+    "git reset --hard",
+    "Apagar o repositório"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "git revert cria um novo commit que desfaz o anterior sem reescrever o histórico.",
+   "type": "single"
+  },
+  {
+   "id": "fund-009",
+   "topic": "Scrum",
+   "text": "Qual é o timebox da Daily Scrum?",
+   "options": [
+    "15 minutos",
+    "1 hora",
+    "4 horas",
+    "Não tem timebox"
+   ],
+   "correct": [
+    0
+   ],
+   "explanation": "A Daily Scrum tem 15 minutos.",
+   "type": "single"
+  },
+  {
+   "id": "fund-010",
+   "topic": "Scrum",
+   "text": "Quem é responsável por ordenar o Product Backlog?",
+   "options": [
+    "Scrum Master",
+    "Developers",
+    "Product Owner",
+    "Stakeholders"
+   ],
+   "correct": [
+    2
+   ],
+   "explanation": "O Product Owner é responsável pela gestão e ordenação do Product Backlog.",
+   "type": "single"
+  },
+  {
+   "id": "fund-011",
+   "topic": "Scrum",
+   "text": "Quais destes são artefactos do Scrum? (escolhe 2)",
+   "options": [
+    "Product Backlog",
+    "Daily Scrum",
+    "Increment",
+    "Sprint Review"
+   ],
+   "correct": [
+    0,
+    2
+   ],
+   "explanation": "Os artefactos são Product Backlog, Sprint Backlog e Increment; os outros são eventos.",
+   "type": "multiple"
+  },
+  {
+   "id": "fund-012",
+   "topic": "FastAPI",
+   "text": "Que código HTTP deve devolver uma API quando um recurso não existe?",
+   "options": [
+    "200",
+    "404",
+    "500",
+    "201"
+   ],
+   "correct": [
+    1
+   ],
+   "explanation": "404 Not Found.",
+   "type": "single"
+  },
+  {
+   "id": "vf-001",
+   "topic": "Fundamentos de LLM",
+   "text": "Um LLM consulta a internet em tempo real para responder a cada pergunta.",
+   "type": "truefalse",
+   "correct": false,
+   "explanation": "Um LLM só sabe o que aprendeu no treino (e o que lhe é dado no prompt)."
+  },
+  {
+   "id": "vf-002",
+   "topic": "RAG",
+   "text": "Em RAG, os pesos do modelo não são alterados.",
+   "type": "truefalse",
+   "correct": true,
+   "explanation": "O RAG acrescenta contexto ao prompt; não re-treina o modelo."
+  },
+  {
+   "id": "vf-003",
+   "topic": "Python",
+   "text": "Em Python, uma tuple pode ser alterada depois de criada.",
+   "type": "truefalse",
+   "correct": false,
+   "explanation": "Tuples são imutáveis."
+  },
+  {
+   "id": "vf-004",
+   "topic": "Git",
+   "text": "git revert cria um novo commit que desfaz outro.",
+   "type": "truefalse",
+   "correct": true,
+   "explanation": "É a forma segura de desfazer commits partilhados."
+  },
+  {
+   "id": "vf-005",
+   "topic": "Scrum",
+   "text": "A Daily Scrum tem um timebox de 15 minutos.",
+   "type": "truefalse",
+   "correct": true,
+   "explanation": "O Scrum Guide define 15 minutos."
+  }
+ ]
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+  <title>Simulador de Exames · Loop Future Academy</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" data-action="home">
+      <span class="brand-loop">LOOP</span><span class="brand-future">FUTURE</span>
+      <span class="brand-sep"></span>
+      <span class="brand-app">Simulador de Exames</span>
+    </a>
+    <nav class="topnav">
+      <button class="link" data-action="ranking">Ranking</button>
+      <a href="/docs" target="_blank" rel="noopener">API</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <section id="view-home" class="view">
+      <div class="hero">
+        <p class="eyebrow">Treino para certificação</p>
+        <h1>Prepara o exame<br>como se fosse o dia do exame.</h1>
+        <p class="lead" id="countdown">Escolhe os tópicos, o número de perguntas e o tempo.</p>
+        <div class="stats" id="stats"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Novo exame</h2>
+        <div class="presets">
+          <button class="preset" data-questions="10" data-minutes="15"><strong>Treino rápido</strong><span>10 perguntas · 15 min</span></button>
+          <button class="preset" data-questions="25" data-minutes="30"><strong>Meio simulado</strong><span>25 perguntas · 30 min</span></button>
+          <button class="preset" data-questions="50" data-minutes="60"><strong>Simulado completo</strong><span>50 perguntas · 60 min</span></button>
+        </div>
+        <div class="form-row">
+          <label>Perguntas<input id="num-questions" type="number" value="10"></label>
+          <label>Minutos<input id="duration" type="number" value="15"></label>
+          <label class="check"><input type="checkbox" id="study"> Modo treino (vê logo se acertaste)</label>
+        </div>
+        <p class="label">Tópicos <span class="muted">(nenhum selecionado = todos)</span></p>
+        <div id="topics" class="chips"></div>
+        <button id="start" class="btn btn-primary btn-lg">Começar exame</button>
+        <p id="home-error" class="error" hidden></p>
+      </div>
+
+      <div class="home-grid">
+        <div class="panel">
+          <h2>O meu perfil</h2>
+          <form id="profile-form" class="profile">
+            <label>Nome<input id="p-name" placeholder="Ana Silva"></label>
+            <label>Certificação<input id="p-cert" placeholder="NVIDIA NCA-GENL"></label>
+            <label>Data do exame<input id="p-date" type="date"></label>
+            <button class="btn btn-ghost" type="submit">Guardar</button>
+          </form>
+          <p id="profile-error" class="error" hidden></p>
+        </div>
+        <div class="panel">
+          <h2>Traz as tuas perguntas</h2>
+          <p class="muted">Ficheiro <code>.json</code> ou <code>.csv</code>.</p>
+          <form id="upload-form" class="upload">
+            <input type="file" id="upload-file" accept=".json,.csv">
+            <button class="btn btn-ghost" type="submit">Importar</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-exam" class="view" hidden>
+      <div class="exam-bar">
+        <div>
+          <p class="eyebrow" id="exam-progress">Pergunta 1 de 10</p>
+          <div class="progress"><div id="exam-progress-bar"></div></div>
+        </div>
+        <div class="timer" id="timer">--:--</div>
+      </div>
+      <div class="exam-layout">
+        <article class="question-card">
+          <p class="q-topic" id="q-topic"></p>
+          <h2 id="q-text"></h2>
+          <p class="q-hint" id="q-hint"></p>
+          <div id="q-options" class="options"></div>
+          <p id="q-feedback" class="why" hidden></p>
+          <div class="q-actions">
+            <button class="btn btn-ghost" id="prev">← Anterior</button>
+            <button class="btn btn-primary" id="next">Seguinte →</button>
+          </div>
+        </article>
+        <aside class="navigator">
+          <p class="label">Navegação</p>
+          <div id="nav-grid" class="nav-grid"></div>
+          <button class="btn btn-dark btn-block" id="finish">Entregar exame</button>
+        </aside>
+      </div>
+    </section>
+
+    <section id="view-result" class="view" hidden>
+      <div class="result-hero" id="result-hero"></div>
+      <div class="panel">
+        <h2>Revisão</h2>
+        <div id="review"></div>
+      </div>
+      <button class="btn btn-primary btn-lg" data-action="home">Novo exame</button>
+    </section>
+
+    <section id="view-ranking" class="view" hidden>
+      <p class="eyebrow">Toda a turma</p>
+      <h1>Ranking</h1>
+      <div class="panel"><table class="ranking"><thead><tr><th>#</th><th>Nome</th><th>Nota</th><th>Quando</th></tr></thead><tbody id="ranking-body"></tbody></table></div>
+      <p class="muted"><a href="/api/export.csv">Exportar CSV</a> · <a href="/api/export.yaml">Exportar YAML</a></p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
