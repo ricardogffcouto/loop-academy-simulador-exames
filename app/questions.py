@@ -3,14 +3,33 @@
 import csv
 import io
 import json
-from typing import Annotated
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, model_validator
 
 from app import store
 
 router = APIRouter(prefix="/api", tags=["perguntas"])
+
+class Question(BaseModel):
+    id: str = Field(..., description="Identificador único da pergunta")
+    topic: str = Field(..., description="Tópico da pergunta")
+    text: str = Field(min_length=3)
+    options: list[str] = Field(min_length=2, max_length=6)
+    correct: list[int] = Field(min_length=1)
+    explanation: str = ""
+    type: Literal["single", "multiple"] = "single"
+    @model_validator(mode="after")
+    def validate_corrects(self):
+        if not self.correct:
+            raise ValueError("correct deve ser uma lista de índices")
+        
+        for index in self.correct:
+            if index < 0 or index >= len(self.options):
+                raise ValueError(f"Índice {index} em correct está fora do intervalo de opções")
+        return self
 
 
 @router.get("/topics")
@@ -20,21 +39,23 @@ def list_topics() -> list[str]:
 
 @router.get("/questions")
 def list_questions(topic: str | None = None) -> list[dict]:
-    return [question for question in store.questions.values() if topic is None or question["topic"] == topic]
+    return [question for question in store.questions.values() if topic is None or question["topic"].lower() == topic.lower()]
 
 
 @router.get("/questions/{question_id}")
 def get_question(question_id: str) -> dict:
+    if question_id not in store.questions:
+        raise HTTPException(status_code=404, detail="Pergunta não encontrada")
     return store.questions[question_id]
 
 
 @router.post("/questions")
-async def create_question(request: Request, pwd: str = ""):
+async def create_question(question: Question, pwd: str = ""):
     if pwd != store.ADMIN_PASSWORD:
         return JSONResponse({"erro": "password errada"}, status_code=401)
-    question = await request.json()
-    question.setdefault("type", "single")
-    add_question(question)
+    if question.id in store.questions:
+        raise HTTPException(status_code=409, detail="Pergunta já existe")
+    add_question(question.model_dump())
     store.save()
     return question
 
