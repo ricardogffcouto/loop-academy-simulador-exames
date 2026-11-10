@@ -8,7 +8,21 @@ from fastapi.responses import PlainTextResponse
 
 from app import store
 
+from pydantic import BaseModel, Field, field_validator
+
 router = APIRouter(prefix="/api", tags=["ranking"])
+
+class RankingEntryIn(BaseModel):
+    """Entrada de ranking enviada pelo cliente."""
+
+    name: str = Field(min_length=1, max_length=30)
+    pct: float = Field(ge=0, le=100)
+
+    @field_validator("name")
+    def name_must_not_contain_html(cls, v: str) -> str:
+        if "<" in v or ">" in v:
+            raise ValueError("name must not contain HTML")
+        return v
 
 
 def exam_score(exam: dict) -> float:
@@ -41,14 +55,13 @@ def get_ranking() -> list[dict]:
 
 
 @router.post("/ranking")
-async def add_ranking_entry(request: Request) -> dict:
-    body = await request.json()
+async def add_ranking_entry(entry: RankingEntryIn) -> dict:
     store.results.append(
         {
             "exam_id": None,
-            "name": body["name"],
+            "name": entry.name,
             "date": datetime.now().strftime("%d/%m %H:%M"),
-            "pct": body["pct"],
+            "pct": entry.pct,
         }
     )
     store.save()

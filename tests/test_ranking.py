@@ -29,18 +29,15 @@ def test_export_csv(client):
 # ---------- Ticket G4-A · Pydantic ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: uma nota vai de 0 a 100")
 def test_pct_above_100_is_422(client):
     assert client.post("/api/ranking", json={"name": "Ana", "pct": 150}).status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: o nome não pode trazer HTML")
 def test_name_with_html_is_422(client):
     r = client.post("/api/ranking", json={"name": "<img src=x onerror=alert(1)>", "pct": 50})
     assert r.status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="G4-A: sem nota é 422, não 500")
 def test_missing_pct_is_422(client):
     assert client.post("/api/ranking", json={"name": "Ana"}).status_code == 422
 
