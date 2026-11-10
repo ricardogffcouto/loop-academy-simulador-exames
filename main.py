@@ -25,7 +25,8 @@ def init():
     for f in os.listdir("data"):
         if f.endswith(".json"):
             try:
-                for x in json.load(open("data/" + f))["questions"]: D["q"][x["id"]] = x
+                with open("data/" + f) as file_data:
+                    for x in json.load(file_data)["questions"]: D["q"][x["id"]] = x
             except json.JSONDecodeError as e:
                 print("Invalid JSON syntax:", e)
                 raise
@@ -34,7 +35,9 @@ def init():
 
 
 def sv():
-    try: json.dump({k: D[k] for k in ["e", "r", "p", "c"]}, open(F, "w"))
+    try: 
+        with open(F, "w") as file_data:
+            json.dump({k: D[k] for k in ["e", "r", "p", "c"]}, file_data)
     except json.JSONDecodeError as e:
         print("Invalid JSON syntax:", e)
         raise
@@ -42,9 +45,10 @@ def sv():
 
 def ld():
     try:
-        d2 = json.load(open(F))
-        for k in d2: D[k] = d2[k]
-        for x in D["c"]: D["q"][x["id"]] = x
+        with open(F) as file_data:
+            d2 = json.load(file_data)
+            for k in d2: D[k] = d2[k]
+            for x in D["c"]: D["q"][x["id"]] = x
     except json.JSONDecodeError as e:
         print("Invalid JSON syntax:", e)
         raise
@@ -117,7 +121,8 @@ async def up(file: UploadFile = File(...)):
 
 
 # gera as perguntas
-def gen(n, t=[]):
+def gen(n, t):
+    t=[]
     if not t: t.extend(tps())
     return random.sample([i for i, x in D["q"].items() if x["topic"] in t], n)
 
