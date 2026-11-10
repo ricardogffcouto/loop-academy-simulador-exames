@@ -3,13 +3,19 @@
 import time
 from datetime import datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
 
 from app import store
 
 router = APIRouter(prefix="/api", tags=["correção"])
 
 TRUE_FALSE_OPTIONS = ["Verdadeiro", "Falso"]
+
+
+class SubmitRequest(BaseModel):
+    answers: dict[str, list[int]] = Field(default_factory=dict)
+    name: str = "anónimo"
 
 
 def is_correct(question: dict, chosen: list[int]) -> bool:
@@ -23,10 +29,9 @@ def is_correct(question: dict, chosen: list[int]) -> bool:
     return False
 
 @router.post("/exam/{exam_id}/submit")
-async def submit_exam(exam_id: str, request: Request) -> dict:
-    body = await request.json()
+async def submit_exam(exam_id: str, body: SubmitRequest) -> dict:
     exam = store.exams[exam_id]
-    answers = body.get("answers", {})
+    answers = body.answers
     score = 0
     review = []
     for qid in exam["questions"]:
@@ -48,7 +53,7 @@ async def submit_exam(exam_id: str, request: Request) -> dict:
         )
     pct = round(score / len(exam["questions"]) * 100, 1)
     exam["answers"] = answers
-    exam["name"] = body.get("name", "anónimo")
+    exam["name"] = body.name
     exam["end"] = time.time()
     store.results.append({"exam_id": exam_id, "name": exam["name"], "date": datetime.now().strftime("%d/%m %H:%M")})
     store.save()
