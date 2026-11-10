@@ -53,17 +53,14 @@ def test_needs_two_options(client, new_question):
 # ---------- Ticket G1-B · erros HTTP ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G1-B: pergunta que não existe é 404, não 500")
 def test_unknown_question_is_404(client):
     assert client.get("/api/questions/nao-existe").status_code == 404
 
 
-@pytest.mark.xfail(strict=True, reason="G1-B: ?topic=git tem de encontrar as perguntas de Git")
 def test_topic_filter_ignores_case(client):
     assert len(client.get("/api/questions", params={"topic": "git"}).json()) > 0
 
 
-@pytest.mark.xfail(strict=True, reason="G1-B: criar com um id que já existe é 409, não sobrescrever")
 def test_duplicate_id_is_409(client, new_question):
     client.post("/api/questions", params=ADMIN, json=new_question)
     assert client.post("/api/questions", params=ADMIN, json=new_question).status_code == 409

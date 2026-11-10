@@ -5,11 +5,12 @@ import io
 import json
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, model_validator
 
 from app import store
-from pydantic import BaseModel, Field, model_validator
+
 router = APIRouter(prefix="/api", tags=["perguntas"])
 
 class Question(BaseModel):
@@ -38,11 +39,13 @@ def list_topics() -> list[str]:
 
 @router.get("/questions")
 def list_questions(topic: str | None = None) -> list[dict]:
-    return [question for question in store.questions.values() if topic is None or question["topic"] == topic]
+    return [question for question in store.questions.values() if topic is None or question["topic"].lower() == topic.lower()]
 
 
 @router.get("/questions/{question_id}")
 def get_question(question_id: str) -> dict:
+    if question_id not in store.questions:
+        raise HTTPException(status_code=404, detail="Pergunta não encontrada")
     return store.questions[question_id]
 
 
@@ -50,7 +53,8 @@ def get_question(question_id: str) -> dict:
 async def create_question(question: Question, pwd: str = ""):
     if pwd != store.ADMIN_PASSWORD:
         return JSONResponse({"erro": "password errada"}, status_code=401)
-
+    if question.id in store.questions:
+        raise HTTPException(status_code=409, detail="Pergunta já existe")
     add_question(question.model_dump())
     store.save()
     return question
