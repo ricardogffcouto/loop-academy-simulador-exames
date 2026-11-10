@@ -1,25 +1,51 @@
 """Grupo 3 · Correção."""
 
 import pytest
+from abc import ABC, abstractmethod
 
-from app.grading import is_correct
 from tests.helpers import take_exam
 
-SINGLE = {"type": "single", "correct": [2]}
-MULTIPLE = {"type": "multiple", "correct": [0, 3]}
-TRUE = {"type": "truefalse", "correct": True}
-FALSE = {"type": "truefalse", "correct": False}
+class Question(ABC):
+    def __init__(self, correct):
+        self.correct = correct
 
+    @abstractmethod
+    def is_correct(self, chosen: list[int]) -> bool:
+        pass
+
+class SingleQuestion(Question):
+    def is_correct(self, chosen: list[int]) -> bool:
+        return len(chosen) == 1 and chosen[0] == self.correct[0]
+
+
+class MultipleQuestion(Question):
+    def is_correct(self, chosen: list[int]) -> bool:
+        return sorted(chosen) == sorted(self.correct)
+
+
+class TrueFalseQuestion(Question):
+    def is_correct(self, chosen: list[int]) -> bool:
+        expected = 0 if self.correct else 1
+        return len(chosen) == 1 and chosen[0] == expected
+
+class Answer:
+    def __init__(self, question: Question, chosen: list[int]):
+        self.question = question
+        self.chosen = chosen
+
+    def is_correct(self):
+        return self.question.is_correct(self.chosen)
+    
 
 def test_single_right_and_wrong():
-    assert is_correct(SINGLE, [2])
-    assert not is_correct(SINGLE, [1])
-    assert not is_correct(SINGLE, [])
+    assert SingleQuestion([2]).is_correct([2])
+    assert not SingleQuestion([2]).is_correct([1])
+    assert not SingleQuestion([2]).is_correct([])
 
 
 def test_multiple_order_does_not_matter():
-    assert is_correct(MULTIPLE, [3, 0])
-    assert not is_correct(MULTIPLE, [0])
+    assert MultipleQuestion([0, 3]).is_correct([3, 0])
+    assert not MultipleQuestion([0, 3]).is_correct([0])
 
 
 def test_submit_all_right(client):
@@ -31,18 +57,15 @@ def test_submit_all_right(client):
 # ---------- Ticket G3-A · uma regra de correção (+ Pydantic) ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G3-A: Verdadeiro (0) numa pergunta verdadeira é certo")
-def test_true_false_true():
-    assert is_correct(TRUE, [0])
-    assert not is_correct(TRUE, [1])
+def test_true_false_true_question():
+    assert TrueFalseQuestion(True).is_correct([0])
+    assert not TrueFalseQuestion(True).is_correct([1])
 
 
-@pytest.mark.xfail(strict=True, reason="G3-A: Falso (opção 1) numa pergunta falsa está certo")
-def test_true_false_false():
-    assert is_correct(FALSE, [1])
+def test_true_false_false_question():
+    assert TrueFalseQuestion(False).is_correct([1])
+    assert not TrueFalseQuestion(False).is_correct([0])
 
-
-@pytest.mark.xfail(strict=True, reason="G3-A: as respostas são listas de índices")
 def test_answers_must_be_lists(client):
     exam = client.post("/api/exam", json={"num": 2}).json()
     qid = exam["questions"][0]["id"]

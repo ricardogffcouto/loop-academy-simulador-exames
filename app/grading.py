@@ -18,9 +18,9 @@ def is_correct(question: dict, chosen: list[int]) -> bool:
         return len(chosen) == 1 and chosen[0] == question["correct"][0]
     if question["type"] == "multiple":
         return sorted(chosen) == sorted(question["correct"])
-    # TODO: verdadeiro/falso
+    if question["type"] == "truefalse":
+        return len(chosen) == 1 and chosen[0] == (0 if question["correct"] else 1)
     return False
-
 
 @router.post("/exam/{exam_id}/submit")
 async def submit_exam(exam_id: str, request: Request) -> dict:
