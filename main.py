@@ -1,14 +1,17 @@
 # exam sim v0.3 - feito a correr p/ a demo, depois limpa-se
 # NAO MEXER no D sem falar comigo!!
-from fastapi import FastAPI, Request, UploadFile, File
+import csv
+import io
+import json
+import os
+import random
+import time
+import uuid
+from datetime import date, datetime
+
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-import json, random, os, time, csv, io
-from datetime import datetime, date
-import uuid
-import math
-import re
-import sys
 
 app = FastAPI(title="Simulador de Exames")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -22,24 +25,32 @@ def init():
     for f in os.listdir("data"):
         if f.endswith(".json"):
             try:
-                for x in json.load(open("data/" + f))["questions"]: D["q"][x["id"]] = x
-            except:
-                pass
+                with open("data/" + f) as fd:
+                    for x in json.load(fd)["questions"]: 
+                        D["q"][x["id"]] = x
+            except (OSError, json.JSONDecodeError, KeyError) as e:
+                print("erro", f, e)
     print ("ok",len(D["q"]))
 
 
 def sv():
-    try: json.dump({k: D[k] for k in ["e", "r", "p", "c"]}, open(F, "w"))
-    except Exception as e: print("erro", e)
+    try:
+        with open(F, "w") as fd:
+            json.dump({k: D[k] for k in ["e", "r", "p", "c"]}, fd)
+    except (OSError, TypeError, ValueError) as e:
+        print("erro", F, e)
 
 
 def ld():
     try:
-        d2 = json.load(open(F))
-        for k in d2: D[k] = d2[k]
-        for x in D["c"]: D["q"][x["id"]] = x
-    except:
-        pass
+        with open(F) as fd:
+            d2 = json.load(fd)
+        for k in d2:
+            D[k] = d2[k]
+        for x in D["c"]:
+            D["q"][x["id"]] = x
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as e:
+        print("erro", F, e)
 
 
 init(); ld()
@@ -73,7 +84,7 @@ def validate(x):
 
 
 @app.get("/api/questions")
-def qs(topic: str = None):
+def qs(topic: str | None = None):
     return [x for x in D["q"].values() if topic == None or x["topic"] == topic]
 
 
@@ -108,7 +119,9 @@ async def up(file: UploadFile = File(...)):
 
 
 # gera as perguntas
-def gen(n, t=[]):
+def gen(n, t=None):
+    if t is None: 
+        t = []
     if not t: t.extend(tps())
     return random.sample([i for i, x in D["q"].items() if x["topic"] in t], n)
 
@@ -136,12 +149,8 @@ async def sub(i, request: Request):
     b = await request.json(); e = D["e"][i]; a = b.get("answers", {}); s = 0; rv = []
     for j in e["questions"]:
         x = D["q"][j]; y = a.get(j, []); ok = False
-        if x["type"] == "single":
-            if len(y) == 1:
-                if y[0] == x["correct"][0]:
-                    ok = True
-        elif x["type"] == "multiple":
-            if sorted(y) == sorted(x["correct"]): ok = True
+        if x["type"] == "single" and len(y) == 1 and y[0] == x["correct"][0] or x["type"] == "multiple" and sorted(y) == sorted(x["correct"]): 
+            ok = True
         # TODO v/f
         if ok == True:
             s = s + 1
