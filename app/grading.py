@@ -3,7 +3,7 @@
 import time
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app import store
@@ -30,6 +30,10 @@ def is_correct(question: dict, chosen: list[int]) -> bool:
 
 @router.post("/exam/{exam_id}/submit")
 async def submit_exam(exam_id: str, body: SubmitRequest) -> dict:
+    if exam_id not in store.exams:
+        raise HTTPException(status_code=404, detail="Exame não encontrado")
+    if store.exams[exam_id].copy().get("answers") is not None:
+        raise HTTPException(status_code=409, detail="Exame já entregue")
     exam = store.exams[exam_id]
     answers = body.answers
     score = 0

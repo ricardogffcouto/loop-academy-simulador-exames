@@ -27,14 +27,6 @@ class TrueFalseQuestion(Question):
     def is_correct(self, chosen: list[int]) -> bool:
         expected = 0 if self.correct else 1
         return len(chosen) == 1 and chosen[0] == expected
-
-class Answer:
-    def __init__(self, question: Question, chosen: list[int]):
-        self.question = question
-        self.chosen = chosen
-
-    def is_correct(self):
-        return self.question.is_correct(self.chosen)
     
 
 def test_single_right_and_wrong():
@@ -76,12 +68,10 @@ def test_answers_must_be_lists(client):
 # ---------- Ticket G3-B · erros HTTP ----------
 
 
-@pytest.mark.xfail(strict=True, reason="G3-B: entregar um exame que não existe é 404")
 def test_submit_unknown_exam_is_404(client):
     assert client.post("/api/exam/nao-existe/submit", json={"answers": {}}).status_code == 404
 
 
-@pytest.mark.xfail(strict=True, reason="G3-B: entregar o mesmo exame duas vezes é 409")
 def test_submit_twice_is_409(client):
     exam = client.post("/api/exam", json={"num": 2}).json()
     client.post(f"/api/exam/{exam['id']}/submit", json={"answers": {}})
