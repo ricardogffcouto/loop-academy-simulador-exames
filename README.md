@@ -59,19 +59,32 @@ Cada pergunta tem:
 6. **Fontes testadas:** todos os URLs respondem, e os 52 papers citados confirmam-se pelo título no arXiv
    ou na ACL.
 
+### Acrescentar perguntas
+
+1. Escreve a pergunta num ficheiro de `data/bank/` do domínio certo (ou num ficheiro novo, como
+   `data/bank/sw-3.json`), com um `id` novo e único, por exemplo `sw-073`. Podes pôr a resposta certa
+   em qualquer posição: o passo 3 baralha.
+2. `python3 tools/bank_tools.py check`: valida o esquema e mostra se a certa ficou a mais longa.
+3. `python3 tools/bank_tools.py shuffle`: baralha **só as perguntas novas** e marca-as com `"shuffled": true`.
+   As que já estão no ar nunca mudam de ordem, porque as tentativas guardam as respostas por posição.
+4. `python3 tools/bank_tools.py links`, depois `git commit`, `git push` e `fly deploy --ha=false`.
+
+As perguntas novas entram logo no simulado aleatório e nos treinos por domínio. Os Simulados 1–6
+ficam como estão. Só corras `mocks` para os refazer antes de a turma os começar, porque mudam a
+composição de cada um e deixa de dar para comparar alunos.
+
+Para corrigir uma pergunta, mantém o `id` e a ordem das opções. Para a retirar, apaga-a do JSON:
+as tentativas antigas ignoram ids que já não existem.
+
 ### Manutenção
 
 ```bash
-python3 tools/bank_tools.py check     # valida o esquema e mostra contagens, viés de comprimento e posições
+python3 tools/bank_tools.py check     # esquema, contagens, viés de comprimento, posições
 python3 tools/bank_tools.py links     # testa todos os URLs das fontes
-python3 tools/bank_tools.py shuffle   # baralha as opções (usar depois de escrever perguntas novas)
+python3 tools/bank_tools.py shuffle   # baralha as opções das perguntas novas
 python3 tools/bank_tools.py mocks     # refaz data/mocks.json (6 simulados disjuntos)
 python3 tools/bank_tools.py apply fix.json   # aplica correções por id: {"sw-020": {"explanation": "..."}}
 ```
-
-Para corrigir uma pergunta, edita o JSON e mantém o `id`: as tentativas antigas referem-se a ele.
-Para retirar uma, apaga-a e corre `mocks`. As tentativas antigas ignoram ids que já não existem.
-Refazer os simulados muda a composição de cada um, por isso faz-se antes de a turma os começar.
 
 ## Correr localmente
 

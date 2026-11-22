@@ -2,7 +2,7 @@
 
     python3 tools/bank_tools.py check            # validate + quality report (answer length bias, positions, counts)
     python3 tools/bank_tools.py apply FIX.json   # merge per-question overrides into the bank files
-    python3 tools/bank_tools.py shuffle          # shuffle option order (seeded by id) so answer positions are balanced
+    python3 tools/bank_tools.py shuffle          # shuffle option order of NEW questions only (marks them "shuffled")
     python3 tools/bank_tools.py mocks            # rebuild data/mocks.json: 6 disjoint mocks of 50 with the exam's domain split
     python3 tools/bank_tools.py links            # check that every source URL answers
 """
@@ -82,6 +82,9 @@ def shuffle() -> None:
     for path in files():
         qs = json.loads(path.read_text())["questions"]
         for q in qs:
+            if q.get("shuffled"):  # never reorder a live question: attempts store answers as option positions
+                continue
+            q["shuffled"] = True
             rng = random.Random(f"shuffle:{q['id']}")
             order = list(range(len(q["options"])))
             rng.shuffle(order)
