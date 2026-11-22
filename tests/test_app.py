@@ -64,6 +64,9 @@ def test_admin_needs_token_and_lists_who_missed(client):
     stats = client.get("/api/admin/questions", headers=h).json()["questions"]
     assert len(stats) == 20 and all(s["missed_by"] == ["Marta"] for s in stats)
     assert client.get("/api/admin/export.csv?token=segredo").text.startswith("nome,")
+    assert client.delete(f"/api/admin/attempts/{a['attempt_id']}").status_code == 401
+    assert client.delete(f"/api/admin/attempts/{a['attempt_id']}", headers=h).status_code == 200
+    assert client.get("/api/admin/attempts", headers=h).json()["attempts"] == []
 
 
 def test_random_and_drill_exams(client):

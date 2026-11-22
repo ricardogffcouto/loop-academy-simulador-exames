@@ -34,8 +34,15 @@
         <td class="num">${a.submitted_at ? `${pill(a.pct)} ${a.correct}/${a.total}` : `<span class="muted">em curso</span>`}</td>
         ${Object.keys(DOM).map((d) => `<td class="num">${a.domains && a.domains[d] ? `${a.domains[d][0]}/${a.domains[d][1]}` : ""}</td>`).join("")}
         <td class="num">${a.duration_s != null ? Math.round(a.duration_s / 60) : ""}${a.late ? "*" : ""}</td>
-        <td>${a.submitted_at ? `<a href="#/tentativa/${a.attempt_id}">ver</a>` : ""}</td></tr>`).join("")}
+        <td>${a.submitted_at ? `<a href="#/tentativa/${a.attempt_id}">ver</a> · ` : ""}<a href="#" data-del="${a.attempt_id}"
+          data-who="${esc(a.name)} · ${esc(a.exam_title)}" class="small">apagar</a></td></tr>`).join("")}
       </table><p class="small muted">* submetido depois do tempo limite.</p>`;
+    view.querySelectorAll("[data-del]").forEach((el) => el.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!confirm(`Apagar a tentativa de ${el.dataset.who}? Não dá para desfazer.`)) return;
+      await fetch(`/api/admin/attempts/${el.dataset.del}`, { method: "DELETE", headers: { "X-Admin-Token": token() } });
+      attempts();
+    }));
   }
 
   async function students() {

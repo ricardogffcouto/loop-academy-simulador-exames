@@ -211,6 +211,16 @@ def admin_attempt(attempt_id: str, x_admin_token: str | None = Header(None)):
     return review(row)
 
 
+@app.delete("/api/admin/attempts/{attempt_id}")
+def admin_delete(attempt_id: str, x_admin_token: str | None = Header(None)):
+    """For test runs and typos in names."""
+    require_admin(x_admin_token)
+    get_row(attempt_id)
+    with db() as conn:
+        conn.execute("DELETE FROM attempts WHERE id = ?", (attempt_id,))
+    return {"deleted": attempt_id}
+
+
 @app.get("/api/admin/questions")
 def admin_questions(x_admin_token: str | None = Header(None), exam_id: str | None = Query(None)):
     """Per-question stats over submitted attempts: how many missed it, and who."""
